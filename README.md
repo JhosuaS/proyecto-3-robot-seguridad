@@ -6,7 +6,7 @@ Sistema de verificación formal mediante **Inferencia por Enumeración** y **Res
 1. Clonar el repositorio:
 
    ```Bash
-   git clone 
+   git clone https://github.com/JhosuaS/proyecto-3-robot-seguridad
    cd proyecto-3-robot-seguridad
    ```
 
