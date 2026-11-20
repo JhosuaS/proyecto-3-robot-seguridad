@@ -1,4 +1,99 @@
 {
-    "TODO": "Definición de variables, reglas, propiedades",
-    "Encargado": "Alexander"
+    "escenario": 2,
+    "nombre": "Violación de propiedad de seguridad",
+    "descripcion": "KB consistente pero con R5 invertida; se espera que P3 falle con contraejemplo.",
+    "sintaxis": "Fórmulas estilo SymPy: ~ (NOT), & (AND), | (OR), >> (implica). Siempre con paréntesis.",
+    "variables": {
+        "OBS": {
+            "tipo": "sensor",
+            "significado": "El sensor de proximidad detecta un obstáculo en la trayectoria frontal."
+        },
+        "BAT_BAJA": {
+            "tipo": "sensor",
+            "significado": "El nivel de batería está por debajo del umbral crítico."
+        },
+        "EMERGENCIA": {
+            "tipo": "estado",
+            "significado": "La parada de emergencia está activa."
+        },
+        "CARGANDO": {
+            "tipo": "estado",
+            "significado": "El robot está acoplado a su base de carga."
+        },
+        "MODO_ECO": {
+            "tipo": "estado",
+            "significado": "El robot opera en modo de ahorro de energía."
+        },
+        "PERMISO_MOV": {
+            "tipo": "autorización",
+            "significado": "El supervisor interno autoriza el desplazamiento del robot."
+        },
+        "AVANZAR": {
+            "tipo": "orden",
+            "significado": "Se emite la orden de avanzar al actuador de tracción."
+        },
+        "GIRAR": {
+            "tipo": "orden",
+            "significado": "Se emite la orden de girar al actuador de dirección."
+        }
+    },
+    "reglas": [
+        {
+            "id": "R1",
+            "formula": "(AVANZAR >> PERMISO_MOV)",
+            "descripcion": "Avanzar exige autorización de movimiento."
+        },
+        {
+            "id": "R2",
+            "formula": "(OBS >> ~PERMISO_MOV)",
+            "descripcion": "Con un obstáculo detectado, el supervisor revoca la autorización de desplazamiento."
+        },
+        {
+            "id": "R3",
+            "formula": "(EMERGENCIA >> ~PERMISO_MOV)",
+            "descripcion": "La parada de emergencia revoca toda autorización de desplazamiento."
+        },
+        {
+            "id": "R4",
+            "formula": "(CARGANDO >> ~PERMISO_MOV)",
+            "descripcion": "Mientras carga, el robot no puede desplazarse (evita arrastrar el cable/base)."
+        },
+        {
+            "id": "R5",
+            "formula": "(MODO_ECO >> BAT_BAJA)",
+            "descripcion": "DEFECTUOSA: implicación escrita al revés (debería ser BAT_BAJA >> MODO_ECO). Así, batería baja ya no activa el modo ahorro."
+        },
+        {
+            "id": "R6",
+            "formula": "(MODO_ECO >> ~AVANZAR)",
+            "descripcion": "En modo ahorro no se avanza (solo se permite girar o esperar)."
+        },
+        {
+            "id": "R7",
+            "formula": "(EMERGENCIA >> ~GIRAR)",
+            "descripcion": "En emergencia también se bloquea el giro."
+        },
+        {
+            "id": "R8",
+            "formula": "~(AVANZAR & GIRAR)",
+            "descripcion": "Las órdenes avanzar y girar son mutuamente excluyentes."
+        }
+    ],
+    "propiedades": [
+        {
+            "id": "P1",
+            "formula": "(OBS >> ~AVANZAR)",
+            "descripcion": "Nunca se avanza frente a un obstáculo."
+        },
+        {
+            "id": "P2",
+            "formula": "(EMERGENCIA >> (~AVANZAR & ~GIRAR))",
+            "descripcion": "En emergencia el robot no ejecuta ningún movimiento."
+        },
+        {
+            "id": "P3",
+            "formula": "((BAT_BAJA | CARGANDO) >> ~AVANZAR)",
+            "descripcion": "Con batería baja o cargando no se avanza."
+        }
+    ]
 }
