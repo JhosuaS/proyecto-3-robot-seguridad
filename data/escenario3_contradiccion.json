@@ -1,4 +1,104 @@
 {
-    "TODO": "Definición de variables, reglas, propiedades",
-    "Encargado": "Melanie"
+    "escenario": 3,
+    "nombre": "Condiciones de entorno y tareas domésticas",
+    "descripcion": "El robot opera en un hogar realizando tareas de limpieza y cocina. Las reglas modelan restricciones de energía, acceso a habitaciones y permisos de operación. Se espera que P1 y P2 se cumplan, y P3 falle con contraejemplo.",
+    "sintaxis": "Fórmulas estilo SymPy: ~ (NOT), & (AND), | (OR), >> (implica). Siempre con paréntesis.",
+    "variables": {
+        "BAT_CRITICA": {
+            "tipo": "sensor",
+            "significado": "El nivel de batería está por debajo del 10%, considerado crítico."
+        },
+        "PUERTA_ABIERTA": {
+            "tipo": "sensor",
+            "significado": "El sensor de puerta detecta que la puerta principal del hogar está abierta."
+        },
+        "MODO_REPOSO": {
+            "tipo": "estado",
+            "significado": "El robot se encuentra en modo de reposo (standby), sin ejecutar tareas."
+        },
+        "EN_CARGA": {
+            "tipo": "estado",
+            "significado": "El robot está conectado a su estación de carga."
+        },
+        "TAREA_LIMPIEZA": {
+            "tipo": "orden",
+            "significado": "Se emite la orden de ejecutar la rutina de limpieza (aspirar/fregar)."
+        },
+        "TAREA_COCINA": {
+            "tipo": "orden",
+            "significado": "Se emite la orden de asistir en tareas de cocina (transportar ingredientes)."
+        },
+        "PERMISO_TAREA": {
+            "tipo": "autorización",
+            "significado": "El planificador interno autoriza la ejecución de cualquier tarea doméstica."
+        },
+        "ALERTA_SALIDA": {
+            "tipo": "estado",
+            "significado": "Se activa una alerta indicando riesgo de salida del robot por la puerta abierta."
+        }
+    },
+    "reglas": [
+        {
+            "id": "R1",
+            "formula": "(TAREA_LIMPIEZA >> PERMISO_TAREA)",
+            "descripcion": "Ejecutar limpieza requiere autorización del planificador."
+        },
+        {
+            "id": "R2",
+            "formula": "(TAREA_COCINA >> PERMISO_TAREA)",
+            "descripcion": "Asistir en cocina requiere autorización del planificador."
+        },
+        {
+            "id": "R3",
+            "formula": "(BAT_CRITICA >> ~PERMISO_TAREA)",
+            "descripcion": "Con batería crítica se revoca toda autorización de tareas."
+        },
+        {
+            "id": "R4",
+            "formula": "(BAT_CRITICA >> MODO_REPOSO)",
+            "descripcion": "Con batería crítica el robot entra automáticamente en modo reposo."
+        },
+        {
+            "id": "R5",
+            "formula": "(MODO_REPOSO >> ~TAREA_LIMPIEZA)",
+            "descripcion": "En modo reposo no se ejecuta la rutina de limpieza."
+        },
+        {
+            "id": "R6",
+            "formula": "(EN_CARGA >> ~TAREA_LIMPIEZA)",
+            "descripcion": "Mientras carga no se puede ejecutar limpieza (evita desconexión)."
+        },
+        {
+            "id": "R7",
+            "formula": "(PUERTA_ABIERTA >> ALERTA_SALIDA)",
+            "descripcion": "Con la puerta abierta se activa la alerta de posible salida del robot."
+        },
+        {
+            "id": "R8",
+            "formula": "(ALERTA_SALIDA >> ~PERMISO_TAREA)",
+            "descripcion": "Con alerta de salida activa se bloquean todas las tareas para evitar que el robot se acerque a la puerta."
+        },
+        {
+            "id": "R9",
+            "formula": "~(TAREA_LIMPIEZA & TAREA_COCINA)",
+            "descripcion": "Las tareas de limpieza y cocina son mutuamente excluyentes."
+        }
+    ],
+    "propiedades": [
+        {
+            "id": "P1",
+            "formula": "(BAT_CRITICA >> ~TAREA_LIMPIEZA)",
+            "descripcion": "Con batería crítica nunca se ejecuta la limpieza."
+        },
+        {
+            "id": "P2",
+            "formula": "(PUERTA_ABIERTA >> (~TAREA_LIMPIEZA & ~TAREA_COCINA))",
+            "descripcion": "Con la puerta abierta no se ejecuta ninguna tarea doméstica."
+        },
+        {
+            "id": "P3",
+            "formula": "(EN_CARGA >> ~TAREA_COCINA)",
+            "descripcion": "Mientras carga no se asiste en cocina. NOTA: No existe regla que lo impida directamente; se espera un contraejemplo."
+        }
+    ]
 }

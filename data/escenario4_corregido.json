@@ -1,4 +1,104 @@
 {
-    "TODO": "Definición de variables, reglas, propiedades",
-    "Encargado": "Melanie"
+    "escenario": 4,
+    "nombre": "Caso límite: señales contradictorias y fallo de sensor",
+    "descripcion": "El robot recibe señales contradictorias: el sensor de proximidad falla reportando simultáneamente vía libre y obstáculo. Se modelan condiciones de fallo de sensor, interrupción de emergencia manual y una regla defectuosa que genera una brecha de seguridad. Se espera que P1 se cumpla, P2 falle con contraejemplo, y P3 se cumpla vacuamente (KB inconsistente en el subconjunto).",
+    "sintaxis": "Fórmulas estilo SymPy: ~ (NOT), & (AND), | (OR), >> (implica). Siempre con paréntesis.",
+    "variables": {
+        "SENSOR_OK": {
+            "tipo": "sensor",
+            "significado": "El sensor de proximidad funciona correctamente (diagnóstico positivo)."
+        },
+        "SENSOR_FALLO": {
+            "tipo": "sensor",
+            "significado": "Se detecta un fallo en el sensor de proximidad (lectura incoherente)."
+        },
+        "OBS_DETECTADO": {
+            "tipo": "sensor",
+            "significado": "El sensor reporta un obstáculo en la trayectoria frontal."
+        },
+        "EMERGENCIA_MANUAL": {
+            "tipo": "estado",
+            "significado": "El operador humano ha pulsado el botón de parada de emergencia."
+        },
+        "MODO_SEGURO": {
+            "tipo": "estado",
+            "significado": "El robot opera en modo de seguridad restringido (velocidad mínima, solo retroceso)."
+        },
+        "PERMISO_AVANCE": {
+            "tipo": "autorización",
+            "significado": "El controlador autoriza el avance del robot hacia adelante."
+        },
+        "AVANZAR": {
+            "tipo": "orden",
+            "significado": "Se emite la orden de avanzar al actuador de tracción."
+        },
+        "RETROCEDER": {
+            "tipo": "orden",
+            "significado": "Se emite la orden de retroceder al actuador de tracción."
+        }
+    },
+    "reglas": [
+        {
+            "id": "R1",
+            "formula": "(AVANZAR >> PERMISO_AVANCE)",
+            "descripcion": "Avanzar requiere autorización del controlador."
+        },
+        {
+            "id": "R2",
+            "formula": "(OBS_DETECTADO >> ~PERMISO_AVANCE)",
+            "descripcion": "Con obstáculo detectado se revoca el permiso de avance."
+        },
+        {
+            "id": "R3",
+            "formula": "(SENSOR_FALLO >> MODO_SEGURO)",
+            "descripcion": "Ante fallo del sensor, el robot entra en modo seguro."
+        },
+        {
+            "id": "R4",
+            "formula": "(MODO_SEGURO >> ~AVANZAR)",
+            "descripcion": "En modo seguro no se permite avanzar."
+        },
+        {
+            "id": "R5",
+            "formula": "(EMERGENCIA_MANUAL >> ~AVANZAR)",
+            "descripcion": "La emergencia manual bloquea el avance."
+        },
+        {
+            "id": "R6",
+            "formula": "(EMERGENCIA_MANUAL >> ~RETROCEDER)",
+            "descripcion": "La emergencia manual también bloquea el retroceso."
+        },
+        {
+            "id": "R7",
+            "formula": "~(SENSOR_OK & SENSOR_FALLO)",
+            "descripcion": "El sensor no puede estar simultáneamente OK y en fallo (exclusión mutua)."
+        },
+        {
+            "id": "R8",
+            "formula": "(SENSOR_OK >> ~MODO_SEGURO)",
+            "descripcion": "DEFECTUOSA: si el sensor está OK, se desactiva el modo seguro. Esto genera una brecha cuando hay obstáculo con sensor funcional, ya que no se fuerza el modo seguro y el permiso depende solo de R2."
+        },
+        {
+            "id": "R9",
+            "formula": "~(AVANZAR & RETROCEDER)",
+            "descripcion": "Las órdenes avanzar y retroceder son mutuamente excluyentes."
+        }
+    ],
+    "propiedades": [
+        {
+            "id": "P1",
+            "formula": "(SENSOR_FALLO >> ~AVANZAR)",
+            "descripcion": "Con fallo de sensor el robot nunca avanza (cadena R3→R4 lo garantiza)."
+        },
+        {
+            "id": "P2",
+            "formula": "(EMERGENCIA_MANUAL >> ~RETROCEDER)",
+            "descripcion": "En emergencia manual el robot no retrocede (R6 lo garantiza directamente)."
+        },
+        {
+            "id": "P3",
+            "formula": "((SENSOR_FALLO & SENSOR_OK) >> ~AVANZAR)",
+            "descripcion": "Si ambos estados del sensor son verdaderos simultáneamente, el robot no avanza. NOTA: R7 hace esta condición contradictoria (antecedente siempre falso), por lo que se cumple vacuamente."
+        }
+    ]
 }
