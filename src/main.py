@@ -48,14 +48,14 @@ def ejecutar_verificacion(ruta_json: Path) -> None:
         t_res = (time.perf_counter() - t0) * 1000
 
         print(
-            f"  [Enumeración] Se cumple: {res_enum['se_cumple']} | "
+            f"  [Enumeración] Se cumple: {res_enum['se_cumple']} |  KB consistente: {res_enum['kb_consistente']} | "
             f"Modelos: {res_enum['modelos_evaluados']} | Tiempo: {t_enum:.3f} ms"
         )
         if res_enum.get("contraejemplo"):
             print(f"     -> Contraejemplo: {res_enum['contraejemplo']}")
 
         print(
-            f"  [Resolución]  Se cumple: {res_res['se_cumple']} | "
+            f"  [Resolución]  Se cumple: {res_res['se_cumple']} | KB consistente: {res_enum['kb_consistente']} | "
             f"Cláusulas gen.: {res_res['clausulas_generadas']} | Tiempo: {t_res:.3f} ms"
         )
         print()
