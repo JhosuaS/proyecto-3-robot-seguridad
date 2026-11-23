@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificador de Seguridad – Robot Doméstico</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- ============================================================ -->
+    <!-- HEADER                                                        -->
+    <!-- ============================================================ -->
+    <header class="header">
+        <div class="header__left">
+            <h1 class="header__title">🤖 Verificador de Seguridad</h1>
+            <span class="header__subtitle">Robot Doméstico</span>
+        </div>
+        <div class="header__right">
+            <select id="selector-escenario" class="select" aria-label="Seleccionar escenario">
+                <option value="">— Seleccionar escenario —</option>
+            </select>
+            <button id="btn-restaurar" class="btn btn--secondary" disabled>
+                ↺ Restaurar original
+            </button>
+            <button id="btn-ejecutar" class="btn btn--primary" disabled>
+                ▶ Ejecutar Verificación
+            </button>
+            <button id="btn-tema" class="btn btn--icon" aria-label="Alternar tema" title="Alternar tema claro/oscuro">
+                🌙
+            </button>
+        </div>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- MAIN: 2-column workspace                                      -->
+    <!-- ============================================================ -->
+    <main class="workspace">
+        <!-- ======== PANEL IZQUIERDO: Editor ======== -->
+        <section class="panel panel--editor" aria-label="Editor de escenario">
+            <div class="panel__header">
+                <h2 class="panel__title">📝 Editor de Escenario</h2>
+                <div class="panel__tabs">
+                    <button class="tab tab--active" data-tab="json">Vista JSON</button>
+                    <button class="tab" data-tab="resumen">Vista Resumida</button>
+                </div>
+            </div>
+
+            <!-- Vista JSON -->
+            <div id="vista-json" class="editor-wrap">
+                <div class="line-numbers" id="line-numbers" aria-hidden="true"></div>
+                <textarea
+                    id="editor-json"
+                    class="editor"
+                    spellcheck="false"
+                    placeholder="Selecciona un escenario o pega un JSON aquí..."
+                ></textarea>
+            </div>
+
+            <!-- Vista Resumida -->
+            <div id="vista-resumen" class="resumen-wrap" hidden>
+                <div id="resumen-contenido" class="resumen-contenido">
+                    <p class="text-muted">Selecciona un escenario para ver el resumen.</p>
+                </div>
+            </div>
+
+            <!-- Indicador de validación -->
+            <div class="editor-status" id="editor-status">
+                <span class="status-icon">⏳</span>
+                <span class="status-text">Sin contenido</span>
+            </div>
+        </section>
+
+        <!-- ======== PANEL DERECHO: Resultados ======== -->
+        <section class="panel panel--results" aria-label="Resultados">
+            <div class="panel__header">
+                <h2 class="panel__title">📊 Resultados</h2>
+            </div>
+
+            <div id="resultados-contenido" class="resultados-contenido">
+                <!-- Estado vacío -->
+                <div id="estado-vacio" class="empty-state">
+                    <div class="empty-state__icon">🔍</div>
+                    <p class="empty-state__text">Selecciona un escenario y ejecuta la verificación para ver los resultados.</p>
+                </div>
+
+                <!-- Loading -->
+                <div id="estado-cargando" class="loading-state" hidden>
+                    <div class="spinner"></div>
+                    <p>Ejecutando verificación...</p>
+                </div>
+
+                <!-- KPIs -->
+                <div id="kpis" class="kpis" hidden>
+                    <div class="kpi" id="kpi-estado">
+                        <span class="kpi__label">Estado Global</span>
+                        <span class="kpi__value" id="kpi-estado-valor">—</span>
+                    </div>
+                    <div class="kpi">
+                        <span class="kpi__label">Tiempo Enumeración</span>
+                        <span class="kpi__value" id="kpi-t-enum">— ms</span>
+                    </div>
+                    <div class="kpi">
+                        <span class="kpi__label">Tiempo Resolución</span>
+                        <span class="kpi__value" id="kpi-t-res">— ms</span>
+                    </div>
+                </div>
+
+                <!-- Tabla de propiedades -->
+                <div id="tabla-propiedades" hidden>
+                    <h3 class="section-title">Verificación por Propiedad</h3>
+                    <div id="propiedades-lista" class="propiedades-lista"></div>
+                </div>
+
+                <!-- Tabla de métricas -->
+                <div id="tabla-metricas" hidden>
+                    <h3 class="section-title">Métricas Comparativas</h3>
+                    <table class="metrics-table">
+                        <thead>
+                            <tr>
+                                <th>Propiedad</th>
+                                <th>Enumeración (ms)</th>
+                                <th>Resolución (ms)</th>
+                                <th>Modelos evaluados</th>
+                                <th>Cláusulas generadas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="metricas-body"></tbody>
+                    </table>
+                </div>
+
+                <!-- Error -->
+                <div id="estado-error" class="error-state" hidden>
+                    <span class="error-state__icon">⚠️</span>
+                    <p class="error-state__text" id="error-mensaje"></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

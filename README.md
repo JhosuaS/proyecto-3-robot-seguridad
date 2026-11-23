@@ -22,11 +22,19 @@ source venv/bin/activate
 ```Bash
 pip install -r requirements.txt
 ```
-4. **Ejecutar el programa**:
+4. **Ejecutar el programa (consola)**:
 
 ```Bash
 python3 -m src.main
 ```
+
+5. **Ejecutar la interfaz web**:
+
+```Bash
+uvicorn src.api:app --reload --port 8000
+```
+Luego abrir `http://localhost:8000` en el navegador.
+
 ### 2. Windows
 1. **Clonar el repositorio y entrar al directorio (en PowerShell o CMD):**
 
@@ -52,11 +60,19 @@ venv\Scripts\activate.bat
 pip install -r requirements.txt
 ```
 
-4. **Ejecutar el programa**:
+4. **Ejecutar el programa (consola)**:
 
 ```PowerShell
 python -m src.main
 ```
+
+5. **Ejecutar la interfaz web**:
+
+```PowerShell
+uvicorn src.api:app --reload --port 8000
+```
+Luego abrir `http://localhost:8000` en el navegador.
+
 ### 3. Google Colab
 1. **Crear un nuevo notebook en Google Colab**.
 
@@ -71,11 +87,19 @@ python -m src.main
 ```Python
 !pip install -r requirements.txt
 ```
-4. **Ejecutar el programa**:
+4. **Ejecutar el programa (consola)**:
 
 ```Python
 !python3 -m src.main
 ```
+
+5. **Ejecutar la interfaz web**:
+
+```Python
+!uvicorn src.api:app --reload --port 8000 &
+```
+> **Nota:** En Google Colab la interfaz web requiere un túnel (por ejemplo `ngrok` o `localtunnel`) para acceder al puerto 8000 desde el navegador.
+
 ---
 
 > **Si al ejecutar `python3 -m src.main` o `python -m src.main` aparece `ModuleNotFoundError: No module named 'src'`:** se debe añadir `PYTHONPATH=.` antes del comando en Linux/Colab (`PYTHONPATH=. python3 -m src.main`) o `$env:PYTHONPATH="."` en PowerShell.
